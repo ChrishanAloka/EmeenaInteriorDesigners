@@ -306,7 +306,7 @@ const QuotationForm = () => {
                 <tr>
                   <th style={{width: '30%'}}>Item</th>
                   <th style={{width: '12%'}}>Qty</th>
-                  <th style={{width: '18%'}}>Line Fit</th>
+                  <th style={{width: '18%'}}></th>
                   <th style={{width: '15%'}}>Unit Price</th>
                   <th style={{width: '15%'}}>Total</th>
                 </tr>
