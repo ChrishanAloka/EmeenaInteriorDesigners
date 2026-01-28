@@ -14,7 +14,7 @@ const QuotationForm = () => {
 
   const [formData, setFormData] = useState({
     date: format(new Date(), 'yyyy-MM-dd'),
-    validTill: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),
+    validTill: format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),
     clientTitle: 'Mr.',
     clientName: '',
     clientCompany: '',
@@ -34,6 +34,7 @@ const QuotationForm = () => {
       { itemName: 'Shop interior designs', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Other interior designs', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Sink', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Tap', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Burner', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Cooker hood', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Plate rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
@@ -321,7 +322,8 @@ const QuotationForm = () => {
                         value={item.quantity}
                         onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                         min="0"
-                        step="0.01"
+                        step="1"
+                        onWheel={(e) => e.currentTarget.blur()}
                       />
                     </td>
                     <td>
@@ -339,6 +341,7 @@ const QuotationForm = () => {
                         onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)}
                         min="0"
                         step="0.01"
+                        onWheel={(e) => e.currentTarget.blur()}
                       />
                     </td>
                     <td>
