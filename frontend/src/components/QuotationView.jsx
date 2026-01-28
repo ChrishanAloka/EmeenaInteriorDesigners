@@ -260,7 +260,7 @@ const QuotationView = () => {
               <th style={{width: '8%'}}>No</th>
               <th style={{width: '40%'}}>Item</th>
               <th style={{width: '10%'}}>Qty</th>
-              <th style={{width: '15%'}}>Line Fit</th>
+              <th style={{width: '15%'}}></th>
               <th style={{width: '14%'}}>Unit Price</th>
               <th style={{width: '13%'}}>Total</th>
             </tr>
