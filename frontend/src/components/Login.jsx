@@ -77,9 +77,9 @@ const Login = () => {
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
           
-          <p className="auth-footer">
+          {/* <p className="auth-footer">
             Don't have an account? <Link to="/register">Register here</Link>
-          </p>
+          </p> */}
         </form>
         
         <div className="company-info">

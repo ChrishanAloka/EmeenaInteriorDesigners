@@ -245,9 +245,9 @@ const QuotationView = () => {
           </div>
 
           <div className="info-section">
-            <p><strong>To:</strong></p>
-            <p>{quotation.clientTitle} {quotation.clientName}</p>
-            {quotation.clientCompany && <p>{quotation.clientCompany}</p>}
+            <p><strong>To: </strong>{quotation.clientTitle} {quotation.clientName}</p>
+            
+            {quotation.clientCompany && <p> {quotation.clientCompany}</p>}
             <p>{quotation.clientAddress}</p>
             {quotation.clientPhone && <p>{quotation.clientPhone}</p>}
           </div>
@@ -296,6 +296,16 @@ const QuotationView = () => {
             <span>Grand Total:</span>
             <strong>{formatCurrency(quotation.grandTotal)}</strong>
           </div>
+          {/* Advance Payment (60%) */}
+          <div className="total-row advance-payment">
+            <span>Advance Payment (60%):</span>
+            <strong>{formatCurrency(quotation.grandTotal * 0.6)}</strong>
+          </div>
+          {/* Balance Payment (40%) */}
+          {/* <div className="total-row">
+            <span>Balance Payment (40%):</span>
+            <strong>{formatCurrency(quotation.grandTotal * 0.4)}</strong>
+          </div> */}
         </div>
 
         {/* Brand Logos - Page 1 footer */}

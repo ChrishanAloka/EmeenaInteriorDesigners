@@ -28,6 +28,9 @@ const Layout = () => {
           <Link to="/quotations/create" className="nav-link">
             ➕ New Quotation
           </Link>
+          <Link to="/invoices/create" className="nav-link">
+            🧾 Create Invoice
+          </Link>
         </div>
 
         <div className="navbar-user">

@@ -4,6 +4,7 @@ import cors from 'cors';
 import connectDB from './config/database.js';
 import authRoutes from './routes/authRoutes.js';
 import quotationRoutes from './routes/quotationRoutes.js';
+import invoiceRoutes from './routes/invoiceRoutes.js'; // Add this
 
 // Load environment variables
 dotenv.config();
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/quotations', quotationRoutes);
+app.use('/api/invoices', invoiceRoutes); // Add this
 
 // Health check route
 app.get('/api/health', (req, res) => {

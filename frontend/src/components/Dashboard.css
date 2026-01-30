@@ -106,7 +106,46 @@
   letter-spacing: 0.5px;
 }
 
-.quotations-section {
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  background: white;
+  padding: 15px 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.tab-button {
+  padding: 12px 28px;
+  border: none;
+  background: #e2e8f0;
+  color: #4a5568;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-button:hover {
+  background: #cbd5e0;
+  transform: translateY(-2px);
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Quotations & Invoices Sections */
+.quotations-section,
+.invoices-section {
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -117,7 +156,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 20px;
 }
@@ -128,10 +167,20 @@
   color: #2d3748;
 }
 
+.section-actions {
+  display: flex;
+  gap: 12px;
+}
+
 .filters {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
 }
 
 .filters select,
@@ -201,14 +250,12 @@
   border-bottom: none;
 }
 
-/* Ensure Grand Total column has enough space */
 .quotations-table th:nth-child(5),
 .quotations-table td:nth-child(5) {
   white-space: nowrap;
-  min-width: 120px; /* Adjust based on typical amount width */
+  min-width: 120px;
 }
 
-/* Optional: make currency slightly smaller if still tight */
 .quotations-table td:nth-child(5) strong {
   font-size: 13px;
 }
@@ -248,13 +295,29 @@
   color: #0d6efd;
 }
 
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  min-width: max-content;
+  height: 36px;
+}
+
 .action-buttons .btn {
   white-space: nowrap;
   min-width: auto;
-  max-width: 120px; /* Prevent excessive width */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin: 5px;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+  box-sizing: border-box;
 }
 
 .btn {
@@ -274,6 +337,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  padding-bottom: 5px;
 }
 
 .btn-primary:hover {
@@ -290,6 +354,20 @@
   background: #cbd5e0;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-danger {
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.btn-danger:hover {
+  background-color: #c53030;
 }
 
 .btn-sm {
@@ -348,7 +426,18 @@
     gap: 16px;
   }
 
-  .quotations-section {
+  .tab-navigation {
+    flex-direction: column;
+    padding: 15px 20px;
+  }
+
+  .tab-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .quotations-section,
+  .invoices-section {
     padding: 24px;
   }
 
@@ -367,25 +456,8 @@
     font-size: 13px;
   }
 
-  /* Optional: reduce horizontal padding in table cells on mobile */
   .quotations-table td,
   .quotations-table th {
     padding: 10px 8px;
   }
-
-  .action-buttons {
-    flex-direction: column;
-  }
-
-  .action-buttons .btn {
-    width: auto; /* override 100% */
-    flex: 1; /* distribute space evenly if needed */
-    max-width: none; /* allow natural width */
-    padding: 8px 12px; /* slightly smaller */
-    font-size: 12px;
-    gap: 2px;
-  }
 }
-
-
-

@@ -9,6 +9,8 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import QuotationForm from './components/QuotationForm';
 import QuotationView from './components/QuotationView';
+import InvoiceForm from './components/InvoiceForm';
+import InvoiceView from './components/InvoiceView'; // Add this
 import './index.css';
 
 function App() {
@@ -57,6 +59,8 @@ function App() {
             <Route path="quotations/create" element={<QuotationForm />} />
             <Route path="quotations/edit/:id" element={<QuotationForm />} />
             <Route path="quotations/view/:id" element={<QuotationView />} />
+            <Route path="invoices/create" element={<InvoiceForm />} />
+            <Route path="invoices/view/:id" element={<InvoiceView />} /> {/* Add this */}
           </Route>
           
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
