@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://emeenainteriordesigners.onrender.com',
+        target: 'https://emeenainteriordesigners-68tv.onrender.com',
         changeOrigin: true
       }
     }
