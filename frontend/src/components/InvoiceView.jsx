@@ -206,12 +206,12 @@ const InvoiceView = () => {
         <table className="items-table">
           <thead>
             <tr>
-              <th style={{width: '8%'}}>No</th>
-              <th style={{width: '40%'}}>Item</th>
-              <th style={{width: '10%'}}>Qty</th>
-              <th style={{width: '15%'}}>Line fit</th>
-              <th style={{width: '14%'}}>Unit Price</th>
-              <th style={{width: '13%'}}>Total</th>
+              <th style={{ width: '8%' }}>No</th>
+              <th style={{ width: '40%' }}>Item</th>
+              <th style={{ width: '10%' }}>Qty</th>
+              <th style={{ width: '15%' }}>Line fit</th>
+              <th style={{ width: '14%' }}>Unit Price</th>
+              <th style={{ width: '13%' }}>Total</th>
             </tr>
           </thead>
           <tbody>
@@ -263,8 +263,8 @@ const InvoiceView = () => {
 
           <div className="agreement-section">
             <h4>Our Services</h4>
-            <p><strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs</strong></p>
-            <p><strong>Sink | Burner | Cooker hood | Plate rack | Cup and saucer rack | Cutlery tray | Bottle pullout | Spice</strong></p>
+            <p><strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs | Design Table | Other</strong></p>
+            <p><strong>Sink | Tap | Burner | Cooker hood | Plate rack | Cup and saucer rack | Cutlery tray | Bottle pullout | Spice pullout cabinet | Larder unit | Magic cover pullout | Dustbin rack | Glass frame bar</strong></p>
           </div>
 
           {invoice.notes && (

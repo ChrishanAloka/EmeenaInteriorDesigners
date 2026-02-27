@@ -89,6 +89,7 @@ const quotationSchema = new mongoose.Schema({
       { itemName: 'Shop interior designs', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Other interior designs', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Sink', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Tap', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Burner', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Cooker hood', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Plate rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
@@ -99,7 +100,9 @@ const quotationSchema = new mongoose.Schema({
       { itemName: 'Larder unit', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Magic cover pullout', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Dustbin rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: 'Glass frame bar', quantity: 0, lineFit: '', unitPrice: 0, total: 0 }
+      { itemName: 'Glass frame bar', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Design Table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Other', quantity: 0, lineFit: '', unitPrice: 0, total: 0 }
     ]
   },
   subTotal: {

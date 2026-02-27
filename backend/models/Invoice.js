@@ -4,7 +4,7 @@ const invoiceItemSchema = new mongoose.Schema({
   itemName: {
     type: String,
     // Make optional to allow empty rows
-    required: function() {
+    required: function () {
       // Only require if quantity, unitPrice, or lineFit has a value
       return this.quantity > 0 || this.unitPrice > 0 || (this.lineFit && this.lineFit.trim() !== '');
     }
@@ -76,13 +76,33 @@ const invoiceSchema = new mongoose.Schema({
   items: {
     type: [invoiceItemSchema],
     default: [
-      { itemName: 'Pantry total fit', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: 'Accessories', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: 'Electric items', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Pantry up', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Pantry bottom', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Granite', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Quartz', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: '', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: '', quantity: 0, lineFit: '', unitPrice: 0, total: 0 }
+      { itemName: 'TV Wall', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Design Wall', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Dressing Room', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Wardrobe Dressing Table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Bar area', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Salon interior designs', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Shop interior designs', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Other interior designs', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Sink', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Tap', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Burner', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Cooker hood', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Plate rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Cup and saucer rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Cutlery tray', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Bottle pullout', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Spice pullout cabinet', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Larder unit', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Magic cover pullout', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Dustbin rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Glass frame bar', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Design Table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Other', quantity: 0, lineFit: '', unitPrice: 0, total: 0 }
     ]
   },
   subTotal: {
@@ -151,9 +171,9 @@ invoiceSchema.pre('validate', async function (next) {
 });
 
 // Pre-save hook to filter out empty items
-invoiceSchema.pre('save', function(next) {
+invoiceSchema.pre('save', function (next) {
   // Filter out items that are completely empty
-  this.items = this.items.filter(item => 
+  this.items = this.items.filter(item =>
     item.itemName || item.quantity > 0 || item.unitPrice > 0 || item.lineFit
   );
   next();

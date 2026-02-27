@@ -45,7 +45,9 @@ const QuotationForm = () => {
       { itemName: 'Larder unit', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Magic cover pullout', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Dustbin rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: 'Glass frame bar', quantity: 0, lineFit: '', unitPrice: 0, total: 0 }
+      { itemName: 'Glass frame bar', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Design Table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Other', quantity: 0, lineFit: '', unitPrice: 0, total: 0 }
     ],
     taxVAT: 0,
     discount: 0,
@@ -74,7 +76,7 @@ const QuotationForm = () => {
       setLoading(true);
       const response = await quotationAPI.getById(id);
       const data = response.data.data;
-      
+
       setFormData({
         ...data,
         date: format(new Date(data.date), 'yyyy-MM-dd'),
@@ -107,11 +109,11 @@ const QuotationForm = () => {
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...formData.items];
     updatedItems[index][field] = field === 'lineFit' ? value : parseFloat(value) || 0;
-    
+
     if (field === 'quantity' || field === 'unitPrice') {
       updatedItems[index].total = updatedItems[index].quantity * updatedItems[index].unitPrice;
     }
-    
+
     setFormData({
       ...formData,
       items: updatedItems
@@ -120,7 +122,7 @@ const QuotationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.clientName || !formData.clientAddress) {
       toast.error('Please fill in all required client information');
       return;
@@ -128,7 +130,7 @@ const QuotationForm = () => {
 
     try {
       setLoading(true);
-      
+
       const submitData = {
         ...formData,
         subTotal: totals.subTotal,
@@ -142,7 +144,7 @@ const QuotationForm = () => {
         await quotationAPI.create(submitData);
         toast.success('Quotation created successfully!');
       }
-      
+
       navigate('/dashboard');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to save quotation');
@@ -305,11 +307,11 @@ const QuotationForm = () => {
             <table className="items-table">
               <thead>
                 <tr>
-                  <th style={{width: '30%'}}>Item</th>
-                  <th style={{width: '12%'}}>Qty</th>
-                  <th style={{width: '18%'}}></th>
-                  <th style={{width: '15%'}}>Unit Price</th>
-                  <th style={{width: '15%'}}>Total</th>
+                  <th style={{ width: '30%' }}>Item</th>
+                  <th style={{ width: '12%' }}>Qty</th>
+                  <th style={{ width: '18%' }}></th>
+                  <th style={{ width: '15%' }}>Unit Price</th>
+                  <th style={{ width: '15%' }}>Total</th>
                 </tr>
               </thead>
               <tbody>

@@ -19,13 +19,33 @@ const InvoiceForm = () => {
     clientAddress: '',
     clientPhone: '',
     items: [
-      { itemName: 'Pantry total fit', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: 'Accessories', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: 'Electric items', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Pantry up', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Pantry bottom', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Granite', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Quartz', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: '', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: '', quantity: 0, lineFit: '', unitPrice: 0, total: 0 }
+      { itemName: 'TV Wall', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Design Wall', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Dressing Room', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Wardrobe Dressing Table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Bar area', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Salon interior designs', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Shop interior designs', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Other interior designs', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Sink', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Tap', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Burner', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Cooker hood', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Plate rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Cup and saucer rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Cutlery tray', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Bottle pullout', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Spice pullout cabinet', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Larder unit', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Magic cover pullout', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Dustbin rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Glass frame bar', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Design Table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Other', quantity: 0, lineFit: '', unitPrice: 0, total: 0 }
     ],
     taxVAT: 0,
     discount: 0,
@@ -81,11 +101,11 @@ const InvoiceForm = () => {
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...formData.items];
     updatedItems[index][field] = field === 'lineFit' ? value : parseFloat(value) || 0;
-    
+
     if (field === 'quantity' || field === 'unitPrice') {
       updatedItems[index].total = updatedItems[index].quantity * updatedItems[index].unitPrice;
     }
-    
+
     setFormData({
       ...formData,
       items: updatedItems
@@ -103,13 +123,13 @@ const InvoiceForm = () => {
       clientPhone: quotation.clientPhone || '',
       quotationId: quotation._id // This will be a valid ObjectId or null
     }));
-    
+
     toast.success('Client details filled from quotation');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.clientName || !formData.clientAddress) {
       toast.error('Please fill in all required client information');
       return;
@@ -117,9 +137,9 @@ const InvoiceForm = () => {
 
     try {
       setLoading(true);
-      
+
       // Filter out completely empty items before submission
-      const filteredItems = formData.items.filter(item => 
+      const filteredItems = formData.items.filter(item =>
         item.itemName || item.quantity > 0 || item.unitPrice > 0 || item.lineFit
       );
 
@@ -141,7 +161,7 @@ const InvoiceForm = () => {
 
       await invoiceAPI.create(submitData);
       toast.success('Invoice created successfully!');
-      
+
       navigate('/dashboard');
     } catch (error) {
       console.error('Create invoice error:', error);
@@ -328,12 +348,12 @@ const InvoiceForm = () => {
             <table className="items-table">
               <thead>
                 <tr>
-                  <th style={{width: '5%'}}>No</th>
-                  <th style={{width: '40%'}}>Item</th>
-                  <th style={{width: '10%'}}>Qty</th>
-                  <th style={{width: '15%'}}>Line fit</th>
-                  <th style={{width: '15%'}}>Unit Price</th>
-                  <th style={{width: '15%'}}>Total</th>
+                  <th style={{ width: '5%' }}>No</th>
+                  <th style={{ width: '40%' }}>Item</th>
+                  <th style={{ width: '10%' }}>Qty</th>
+                  <th style={{ width: '15%' }}>Line fit</th>
+                  <th style={{ width: '15%' }}>Unit Price</th>
+                  <th style={{ width: '15%' }}>Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -405,10 +425,10 @@ const InvoiceForm = () => {
           <h2>Our Services</h2>
           <div className="services-section">
             <p>
-              <strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs</strong>
+              <strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs | Design Table | Other</strong>
             </p>
             <p>
-              <strong>Sink | Burner | Cooker hood | Plate rack | Cup and saucer rack | Cutlery tray | Bottle pullout | Spice</strong>
+              <strong>Sink | Tap | Burner | Cooker hood | Plate rack | Cup and saucer rack | Cutlery tray | Bottle pullout | Spice pullout cabinet | Larder unit | Magic cover pullout | Dustbin rack | Glass frame bar</strong>
             </p>
           </div>
         </div>
