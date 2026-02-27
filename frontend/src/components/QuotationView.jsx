@@ -89,6 +89,106 @@ const QuotationView = () => {
         useCORS: true, // For images from external domains
         allowTaint: true,
         logging: false,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.querySelector('.quotation-view.printable');
+          if (clonedElement) {
+            // Force Print-like dimensions and styles
+            clonedElement.style.width = '210mm';
+            clonedElement.style.padding = '5mm';
+            clonedElement.style.margin = '0';
+            clonedElement.style.boxShadow = 'none';
+            clonedElement.style.borderRadius = '0';
+            clonedElement.style.fontSize = '10pt';
+            clonedElement.style.lineHeight = '1.2';
+
+            // Shrink p and li tags
+            const smallTexts = clonedElement.querySelectorAll('p, li');
+            smallTexts.forEach(txt => {
+              txt.style.fontSize = '8.5pt';
+              txt.style.lineHeight = '1.2';
+              txt.style.margin = '2px 0';
+            });
+
+            const smallTexts2 = clonedElement.querySelectorAll('span, strong');
+            smallTexts2.forEach(txt => {
+              txt.style.fontSize = '8.5pt';
+              txt.style.lineHeight = '1.2';
+              txt.style.margin = '0';
+            });
+
+            const declarationFields = clonedElement.querySelectorAll('.declaration-fields p');
+            declarationFields.forEach(txt => {
+              txt.style.padding = '5px 5px';
+              txt.style.fontSize = '8.5pt';
+              txt.style.lineHeight = '1.2';
+              txt.style.margin = '2px 2px';
+            });
+
+            const quotationTitle = clonedElement.querySelector('.quotation-title');
+            quotationTitle.style.fontSize = '16pt';
+            quotationTitle.style.padding = '5px 5px';
+            quotationTitle.style.margin = '0px 0px';
+
+            const totalsSection = clonedElement.querySelector('.totals-section');
+            totalsSection.style.maxWidth = '100%';
+            totalsSection.style.width = '100%';
+
+            const signatureSection = clonedElement.querySelector('.signature-section');
+            signatureSection.style.padding = '0px 0px';
+            signatureSection.style.margin = '0px 0px';
+
+            // Force Service Agreement to page 2
+            const serviceAgreement = clonedElement.querySelector('.service-agreement');
+            if (serviceAgreement) {
+              const beforeElements = [];
+              let curr = serviceAgreement.previousElementSibling;
+              while (curr) {
+                beforeElements.unshift(curr);
+                curr = curr.previousElementSibling;
+              }
+
+              const page1Wrapper = clonedDoc.createElement('div');
+              // A4 height (297mm) - top/bottom padding (10mm total) = 287mm
+              page1Wrapper.style.minHeight = '287mm';
+              page1Wrapper.style.display = 'flex';
+              page1Wrapper.style.flexDirection = 'column';
+
+              beforeElements.forEach(el => page1Wrapper.appendChild(el));
+              clonedElement.insertBefore(page1Wrapper, serviceAgreement);
+            }
+
+            // Sync tables
+            const tableCells = clonedElement.querySelectorAll('.items-table th, .items-table td');
+            tableCells.forEach(cell => {
+              cell.style.padding = '3px 4px';
+              cell.style.fontSize = '9pt';
+              cell.style.border = '1px solid #000';
+            });
+
+            // Sync tables
+            const table2Cells = clonedElement.querySelectorAll('.schedule-table th, .schedule-table td');
+            table2Cells.forEach(cell => {
+              cell.style.padding = '3px 4px';
+              cell.style.fontSize = '9pt';
+              cell.style.border = '1px solid #000';
+            });
+
+            // Small brand logos
+            const brandLogos = clonedElement.querySelectorAll('.brand-logo');
+            brandLogos.forEach(logo => {
+              logo.style.height = '24px';
+              logo.style.width = 'auto';
+            });
+
+            // Make business logo (company logo) height match company details height
+            const businessLogo = clonedElement.querySelector('.company-logo img');
+            const companyDetails = clonedElement.querySelector('.company-details');
+            if (businessLogo && companyDetails) {
+              businessLogo.style.height = `${companyDetails.offsetHeight}px`;
+              businessLogo.style.width = 'auto';
+            }
+          }
+        }
       });
 
       // Get image data
@@ -246,7 +346,7 @@ const QuotationView = () => {
 
           <div className="info-section">
             <p><strong>To: </strong>{quotation.clientTitle} {quotation.clientName}</p>
-            
+
             {quotation.clientCompany && <p> {quotation.clientCompany}</p>}
             <p>{quotation.clientAddress}</p>
             {quotation.clientPhone && <p>{quotation.clientPhone}</p>}
@@ -257,12 +357,12 @@ const QuotationView = () => {
         <table className="items-table">
           <thead>
             <tr>
-              <th style={{width: '8%'}}>No</th>
-              <th style={{width: '40%'}}>Item</th>
-              <th style={{width: '10%'}}>Qty</th>
-              <th style={{width: '15%'}}></th>
-              <th style={{width: '14%'}}>Unit Price</th>
-              <th style={{width: '13%'}}>Total</th>
+              <th style={{ width: '8%' }}>No</th>
+              <th style={{ width: '40%' }}>Item</th>
+              <th style={{ width: '10%' }}>Qty</th>
+              <th style={{ width: '15%' }}></th>
+              <th style={{ width: '14%' }}>Unit Price</th>
+              <th style={{ width: '13%' }}>Total</th>
             </tr>
           </thead>
           <tbody>
@@ -282,24 +382,24 @@ const QuotationView = () => {
         <div className="totals-section">
           <div className="total-row">
             <span>Sub Total:</span>
-            <strong>{formatCurrency(quotation.subTotal)}</strong>
+            <span><strong>{formatCurrency(quotation.subTotal)}</strong></span>
           </div>
           <div className="total-row">
             <span>Tax / VAT ({quotation.taxVAT}%):</span>
-            <strong>{formatCurrency((quotation.subTotal * quotation.taxVAT) / 100)}</strong>
+            <span><strong>{formatCurrency((quotation.subTotal * quotation.taxVAT) / 100)}</strong></span>
           </div>
           <div className="total-row">
             <span>Discount:</span>
-            <strong>- {formatCurrency(quotation.discount)}</strong>
+            <span><strong>- {formatCurrency(quotation.discount)}</strong></span>
           </div>
           <div className="total-row grand-total">
             <span>Grand Total:</span>
-            <strong>{formatCurrency(quotation.grandTotal)}</strong>
+            <span><strong>{formatCurrency(quotation.grandTotal)}</strong></span>
           </div>
           {/* Advance Payment (60%) */}
           <div className="total-row advance-payment">
             <span>Advance Payment (60%):</span>
-            <strong>{formatCurrency(quotation.grandTotal * 0.6)}</strong>
+            <span><strong>{formatCurrency(quotation.grandTotal * 0.6)}</strong></span>
           </div>
           {/* Balance Payment (40%) */}
           {/* <div className="total-row">
@@ -319,7 +419,7 @@ const QuotationView = () => {
 
         <div className="service-agreement">
           <h3>Service Agreement</h3>
-          
+
           <div className="agreement-section">
             <h4>Payments</h4>
             <p>60% of the Grand total must be paid as the advanced payment. Balance payment should be done on the installation day at the project site on the agreed date.</p>
@@ -339,7 +439,7 @@ const QuotationView = () => {
           <div className="agreement-section">
             <h4>Project Period</h4>
             <p>Customer must be available on agreed dates and times for taking measurements, inspections, and installation dates so the project will be completed smoothly and effectively.</p>
-            
+
             <table className="schedule-table">
               <thead>
                 <tr>
@@ -370,7 +470,7 @@ const QuotationView = () => {
           <div className="agreement-section">
             <h4>Declaration</h4>
             <p>Here by I declare that I agree to the terms and conditions of the service agreement.</p>
-            
+
             <div className="declaration-fields">
               <p>Date: ______________________________________________</p>
               <p>Quotation No: {quotation.quotationNo}</p>
@@ -381,35 +481,35 @@ const QuotationView = () => {
           </div>
         </div>
 
-          {quotation.notes && (
-            <div className="notes-section">
-              <h4>Notes:</h4>
-              <p>{quotation.notes}</p>
-            </div>
-          )}
-
-          <div className="signature-section">
-            <div className="signature-box">
-              <div className="signature-line"></div>
-              <p>Signature of the Customer</p>
-            </div>
-            <div className="signature-box">
-              <div className="signature-line"></div>
-              <p>Signature of the Project Manager</p>
-              {/* <p>Name: {quotation.preparedByName}</p>
-              <p>Staff ID: _______</p> */}
-              <p>Name: </p>
-              <p>Staff ID: </p>
-            </div>
+        {quotation.notes && (
+          <div className="notes-section">
+            <h4>Notes:</h4>
+            <p>{quotation.notes}</p>
           </div>
+        )}
 
-          {/* Brand Logos - Page 2 footer */}
-          {/* <div className="brand-logos-page2">
+        <div className="signature-section">
+          <div className="signature-box">
+            <div className="signature-line"></div>
+            <p>Signature of the Customer</p>
+          </div>
+          <div className="signature-box">
+            <div className="signature-line"></div>
+            <p>Signature of the Project Manager</p>
+            {/* <p>Name: {quotation.preparedByName}</p>
+              <p>Staff ID: _______</p> */}
+            <p>Name: </p>
+            <p>Staff ID: </p>
+          </div>
+        </div>
+
+        {/* Brand Logos - Page 2 footer */}
+        {/* <div className="brand-logos-page2">
             <img src={hafeleLogo} alt="Häfele" className="brand-logo" />
             <img src={cocoLogo} alt="CoCo" className="brand-logo" />
             <img src={hettichLogo} alt="Hettich" className="brand-logo" />
           </div> */}
-        
+
       </div>
     </div>
   );

@@ -63,6 +63,111 @@ const InvoiceView = () => {
         useCORS: true,
         allowTaint: true,
         logging: false,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.querySelector('.invoice-view.printable');
+          if (clonedElement) {
+            // Force Print-like dimensions and styles
+            clonedElement.style.width = '210mm';
+            clonedElement.style.minHeight = '297mm';
+            clonedElement.style.padding = '10mm';
+            clonedElement.style.margin = '0';
+            clonedElement.style.boxShadow = 'none';
+            clonedElement.style.borderRadius = '0';
+            clonedElement.style.fontSize = '10pt';
+            clonedElement.style.lineHeight = '1.2';
+
+            const smallTexts = clonedElement.querySelectorAll('p, li');
+            smallTexts.forEach(txt => {
+              txt.style.fontSize = '8.5pt';
+              txt.style.lineHeight = '1.2';
+              txt.style.margin = '2px 0';
+            });
+
+            const smallTexts2 = clonedElement.querySelectorAll('span, strong');
+            smallTexts2.forEach(txt => {
+              txt.style.fontSize = '8.5pt';
+              txt.style.lineHeight = '1.2';
+              txt.style.margin = '0';
+            });
+
+            const totalsSection = clonedElement.querySelector('.totals-section');
+            totalsSection.style.maxWidth = '100%';
+            totalsSection.style.width = '100%';
+
+            const signatureBox = clonedElement.querySelectorAll('.signature-box p');
+            signatureBox.forEach(txt => {
+              txt.style.paddingLeft = '80px';
+              txt.style.paddingTop = '10px';
+              txt.style.margin = '0px 0px';
+            });
+
+            // Sync internal elements to match the print CSS precisely
+            const tableCells = clonedElement.querySelectorAll('.items-table th, .items-table td');
+            tableCells.forEach(cell => {
+              cell.style.padding = '3px 4px';
+              cell.style.fontSize = '9pt';
+              cell.style.border = '1px solid #000';
+            });
+
+            const infoPs = clonedElement.querySelectorAll('.info-section p');
+            infoPs.forEach(p => {
+              p.style.margin = '2px 0';
+              p.style.fontSize = '8.5pt';
+            });
+
+            const totals = clonedElement.querySelectorAll('.total-row');
+            totals.forEach(row => {
+              row.style.fontSize = '9pt';
+              row.style.padding = '2px 0';
+            });
+
+            const headings = clonedElement.querySelectorAll('h2, h3, h4');
+            headings.forEach(h => {
+              if (h.classList.contains('invoice-title')) {
+                h.style.fontSize = '14pt';
+                h.style.margin = '0 0 10px';
+              } else {
+                h.style.fontSize = '10pt';
+                h.style.margin = '0 0 5px';
+              }
+            });
+
+            // Make brand logos small in PDF
+            const brandLogos = clonedElement.querySelectorAll('.brand-logo');
+            brandLogos.forEach(logo => {
+              logo.style.height = '24px';
+              logo.style.width = 'auto';
+            });
+
+            // Make business logo (company logo) height match company details height
+            const businessLogo = clonedElement.querySelector('.company-logo img');
+            const companyDetails = clonedElement.querySelector('.company-details');
+            if (businessLogo && companyDetails) {
+              businessLogo.style.height = `${companyDetails.offsetHeight}px`;
+              businessLogo.style.width = 'auto';
+            }
+
+            const serviceAgreement = clonedElement.querySelector('.service-agreement');
+            if (serviceAgreement) {
+              const beforeElements = [];
+              let curr = serviceAgreement.previousElementSibling;
+              while (curr) {
+                beforeElements.unshift(curr);
+                curr = curr.previousElementSibling;
+              }
+
+              const page1Wrapper = clonedDoc.createElement('div');
+              // A4 height (297mm) - top/bottom padding (10mm total) = 287mm
+              page1Wrapper.style.minHeight = '287mm';
+              page1Wrapper.style.display = 'flex';
+              page1Wrapper.style.flexDirection = 'column';
+
+              beforeElements.forEach(el => page1Wrapper.appendChild(el));
+              clonedElement.insertBefore(page1Wrapper, serviceAgreement);
+            }
+
+          }
+        }
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -283,7 +388,7 @@ const InvoiceView = () => {
               <div className="signature-line"></div>
               <p>Signature of the Project Manager</p>
               <p>Name: {invoice.preparedByName}</p>
-              <p>Staff ID: _______</p>
+              <p>Staff ID:</p>
             </div>
           </div>
         </div>
