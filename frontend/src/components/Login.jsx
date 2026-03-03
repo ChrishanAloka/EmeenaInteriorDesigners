@@ -25,14 +25,14 @@ const Login = () => {
     setIsLoading(true);
 
     const result = await login(formData);
-    
+
     if (result.success) {
       toast.success('Login successful!');
       navigate('/dashboard');
     } else {
       toast.error(result.message);
     }
-    
+
     setIsLoading(false);
   };
 
@@ -43,10 +43,10 @@ const Login = () => {
           <h1>Emeena Interior Designers</h1>
           <p>Quotation Management System</p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="auth-form">
           <h2>Login</h2>
-          
+
           <div className="form-group">
             <label htmlFor="username">Username or Email</label>
             <input
@@ -59,7 +59,7 @@ const Login = () => {
               placeholder="Enter your username"
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
@@ -72,20 +72,19 @@ const Login = () => {
               placeholder="Enter your password"
             />
           </div>
-          
+
           <button type="submit" className="btn btn-primary" disabled={isLoading}>
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
-          
+
           {/* <p className="auth-footer">
             Don't have an account? <Link to="/register">Register here</Link>
           </p> */}
         </form>
-        
+
         <div className="company-info">
-          <p>📞 071 017 22 09 | 076 900 89 78</p>
-          <p>🌐 www.emeena.ecity.lk</p>
-          <p>✉️ info@emeena.ecity.lk</p>
+          <p>🌐 www.solutions.ideasmart.lk</p>
+          <p>✉️ info@solutions.ideasmart.lk | 📞 076 811 9 366</p>
         </div>
       </div>
     </div>

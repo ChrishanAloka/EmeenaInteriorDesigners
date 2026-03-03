@@ -15,8 +15,17 @@ const app = express();
 // Connect to database
 connectDB();
 
-// Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://emeena-web.ecity.lk"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
+app.options("*", cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -36,7 +45,7 @@ app.get('/api/health', (req, res) => {
 
 // Health check
 app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'OK', message: 'Server is running' });
+  res.status(200).json({ status: 'OK', message: 'Server is running' });
 });
 
 // Error handling middleware

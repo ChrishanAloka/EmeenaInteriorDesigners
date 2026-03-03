@@ -8,20 +8,20 @@ import './Dashboard.css';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  
+
   const [stats, setStats] = useState(null);
   const [invoiceStats, setInvoiceStats] = useState(null);
   const [quotations, setQuotations] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('quotations'); // 'quotations' or 'invoices'
-  
+
   const [filters, setFilters] = useState({
     status: '',
     clientName: '',
     page: 1
   });
-  
+
   const [invoiceFilters, setInvoiceFilters] = useState({
     status: '',
     clientName: '',
@@ -35,7 +35,7 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       if (activeTab === 'quotations') {
         const [statsRes, quotationsRes] = await Promise.all([
           quotationAPI.getStats(),
@@ -148,14 +148,14 @@ const Dashboard = () => {
       {/* Statistics Cards */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon" style={{background: '#667eea'}}>📊</div>
+          <div className="stat-icon" style={{ background: '#667eea' }}>📊</div>
           <div className="stat-content">
             <h3>{stats?.totalQuotations || 0}</h3>
             <p>Total Quotations</p>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon" style={{background: '#48bb78'}}>✅</div>
+          <div className="stat-icon" style={{ background: '#48bb78' }}>✅</div>
           <div className="stat-content">
             <h3>
               {stats?.statusBreakdown?.find(s => s._id === 'approved')?.count || 0}
@@ -164,14 +164,14 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon" style={{background: '#3182ce'}}>🧾</div>
+          <div className="stat-icon" style={{ background: '#3182ce' }}>🧾</div>
           <div className="stat-content">
             <h3>{invoiceStats?.totalInvoices || 0}</h3>
             <p>Total Invoices</p>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon" style={{background: '#f56565'}}>💰</div>
+          <div className="stat-icon" style={{ background: '#f56565' }}>💰</div>
           <div className="stat-content">
             <h3>{formatCurrency(invoiceStats?.totalRevenue || 0)}</h3>
             <p>Total Revenue</p>
@@ -206,7 +206,7 @@ const Dashboard = () => {
               </Link>
             </div>
           </div>
-          
+
           <div className="filters">
             <select name="status" value={filters.status} onChange={handleFilterChange}>
               <option value="">All Status</option>
@@ -241,7 +241,7 @@ const Dashboard = () => {
               <tbody>
                 {quotations.length === 0 ? (
                   <tr>
-                    <td colSpan="7" style={{textAlign: 'center', padding: '40px'}}>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '40px' }}>
                       No quotations found. Create your first quotation!
                     </td>
                   </tr>
@@ -312,7 +312,7 @@ const Dashboard = () => {
               </Link>
             </div>
           </div>
-          
+
           <div className="filters">
             <select name="status" value={invoiceFilters.status} onChange={handleInvoiceFilterChange}>
               <option value="">All Status</option>
@@ -345,7 +345,7 @@ const Dashboard = () => {
               <tbody>
                 {invoices.length === 0 ? (
                   <tr>
-                    <td colSpan="6" style={{textAlign: 'center', padding: '40px'}}>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
                       No invoices found. Create your first invoice!
                     </td>
                   </tr>

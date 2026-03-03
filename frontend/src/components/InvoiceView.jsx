@@ -368,7 +368,7 @@ const InvoiceView = () => {
 
           <div className="agreement-section">
             <h4>Our Services</h4>
-            <p><strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs | Design Table | Other</strong></p>
+            <p><strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs | Office Table | Other</strong></p>
             <p><strong>Sink | Tap | Burner | Cooker hood | Plate rack | Cup and saucer rack | Cutlery tray | Bottle pullout | Spice pullout cabinet | Larder unit | Magic cover pullout | Dustbin rack | Glass frame bar</strong></p>
           </div>
 

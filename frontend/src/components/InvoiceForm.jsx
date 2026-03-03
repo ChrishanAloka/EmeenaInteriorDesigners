@@ -44,7 +44,7 @@ const InvoiceForm = () => {
       { itemName: 'Magic cover pullout', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Dustbin rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Glass frame bar', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: 'Design Table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Office Table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Other', quantity: 0, lineFit: '', unitPrice: 0, total: 0 }
     ],
     taxVAT: 0,
@@ -425,7 +425,7 @@ const InvoiceForm = () => {
           <h2>Our Services</h2>
           <div className="services-section">
             <p>
-              <strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs | Design Table | Other</strong>
+              <strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs | Office Table | Other</strong>
             </p>
             <p>
               <strong>Sink | Tap | Burner | Cooker hood | Plate rack | Cup and saucer rack | Cutlery tray | Bottle pullout | Spice pullout cabinet | Larder unit | Magic cover pullout | Dustbin rack | Glass frame bar</strong>

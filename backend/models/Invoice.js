@@ -101,7 +101,7 @@ const invoiceSchema = new mongoose.Schema({
       { itemName: 'Magic cover pullout', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Dustbin rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Glass frame bar', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
-      { itemName: 'Design Table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Office Table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Other', quantity: 0, lineFit: '', unitPrice: 0, total: 0 }
     ]
   },

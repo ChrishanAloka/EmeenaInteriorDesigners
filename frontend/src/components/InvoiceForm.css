@@ -224,6 +224,8 @@
 
 .items-table td {
   background-color: white;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .items-table input {
@@ -291,6 +293,9 @@
   justify-content: space-between;
   padding: 10px 0;
   border-bottom: 1px solid #e5e7eb;
+  flex-wrap: wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .total-row:last-child {
@@ -378,5 +383,11 @@
 
   .quotation-list {
     grid-template-columns: 1fr;
+  }
+
+  .items-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 }
