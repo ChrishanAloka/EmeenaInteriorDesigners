@@ -18,7 +18,8 @@ connectDB();
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "https://emeena-web.ecity.lk"
+    "https://emeena-web.ecity.lk",
+    "https://emeenainteriordesigners-web-ecity.netlify.app"
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
