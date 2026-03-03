@@ -84,7 +84,7 @@ const Login = () => {
 
         <div className="company-info">
           <p>🌐 www.solutions.ideasmart.lk</p>
-          <p>✉️ info@solutions.ideasmart.lk | 📞 076 811 9 366</p>
+          <p>✉️ info@solutions.ideasmart.lk | 📞 076 811 9 360</p>
         </div>
       </div>
     </div>

@@ -61,7 +61,7 @@ const Layout = () => {
 
       <footer className="footer">
         <p>&copy; 2026 ideasmart Solutions. All rights reserved.</p>
-        <p>📞 076 811 9 366 | 📧 info@solutions.ideasmart.lk | 🌐 www.solutions.ideasmart.lk</p>
+        <p>📞 076 811 9 360 | 📧 info@solutions.ideasmart.lk | 🌐 www.solutions.ideasmart.lk</p>
       </footer>
     </div>
   );
