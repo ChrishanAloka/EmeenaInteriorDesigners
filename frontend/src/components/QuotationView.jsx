@@ -336,12 +336,12 @@ const QuotationView = () => {
             <p><strong>Date:</strong> {format(new Date(quotation.date), 'dd/MM/yyyy')}</p>
             <p><strong>Valid Till:</strong> {format(new Date(quotation.validTill), 'dd/MM/yyyy')}</p>
             <p><strong>Prepared by:</strong> {quotation.preparedByName}</p>
-            <p className="no-print">
+            {/* <p className="no-print">
               <strong>Status:</strong>{' '}
               <span className={`badge ${getStatusBadge(quotation.status)}`}>
                 {quotation.status}
               </span>
-            </p>
+            </p> */}
           </div>
 
           <div className="info-section">
