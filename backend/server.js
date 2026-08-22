@@ -21,7 +21,7 @@ app.use(cors({
     "https://emeena-web.ecity.lk",
     "https://emeenainteriordesigners-web-ecity.netlify.app"
   ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));

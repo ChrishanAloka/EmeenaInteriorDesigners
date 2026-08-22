@@ -274,6 +274,14 @@
   background: #f0f4f0;
 }
 
+.items-table tfoot .table-subtotal-row td {
+  background: #eef2ee;
+  border: 1px solid #d0d0d0;
+  padding: 10px 8px;
+  font-size: 14px;
+  color: #2d3748;
+}
+
 .text-center {
   text-align: center;
 }
@@ -573,6 +581,25 @@
   .notes-section {
     page-break-inside: avoid;
     break-inside: avoid;
+  }
+
+  /* Keep the full item table on page 1; push the calculations card and
+     everything after it onto page 2 so nothing is split mid-block. */
+  .totals-section {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* Sub Total row shown at the bottom of the item table */
+  .items-table tfoot .table-subtotal-row td {
+    background: #f0f4f0 !important;
+    font-size: 10pt !important;
+    padding: 5px 6px !important;
+    border: 1px solid #000 !important;
+  }
+
+  .items-table tfoot {
+    display: table-footer-group;
   }
 
   .items-table tbody tr {
