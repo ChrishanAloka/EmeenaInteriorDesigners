@@ -6,6 +6,8 @@ import {
   updateInvoice,
   deleteInvoice,
   updateInvoiceStatus,
+  addInvoicePayment,
+  deleteInvoicePayment,
   getInvoiceStats
 } from '../controllers/invoiceController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
@@ -25,5 +27,9 @@ router.delete('/:id', deleteInvoice);
 
 // Status update route (supervisor and admin only)
 router.patch('/:id/status', authorize('supervisor', 'admin'), updateInvoiceStatus);
+
+// Payment routes (supervisor and admin only)
+router.post('/:id/payments', authorize('supervisor', 'admin'), addInvoicePayment);
+router.delete('/:id/payments/:paymentId', authorize('supervisor', 'admin'), deleteInvoicePayment);
 
 export default router;

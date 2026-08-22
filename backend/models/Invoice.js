@@ -30,6 +30,23 @@ const invoiceItemSchema = new mongoose.Schema({
   }
 });
 
+const invoicePaymentSchema = new mongoose.Schema({
+  amount: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  date: {
+    type: Date,
+    required: true,
+    default: Date.now
+  },
+  note: {
+    type: String,
+    default: ''
+  }
+}, { _id: true });
+
 const invoiceSchema = new mongoose.Schema({
   invoiceNo: {
     type: String,
@@ -139,6 +156,13 @@ const invoiceSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
+  // Later payments recorded against this invoice after creation.
+  // advancePaid stays frozen as the original advance; totalPaid (virtual)
+  // = advancePaid + sum(payments).
+  payments: {
+    type: [invoicePaymentSchema],
+    default: []
+  },
   isDuplicate: {
     type: Boolean,
     default: false
@@ -163,7 +187,22 @@ const invoiceSchema = new mongoose.Schema({
     required: false
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Total actually paid so far = original advance + all later payments.
+invoiceSchema.virtual('totalPaid').get(function () {
+  const laterPayments = Array.isArray(this.payments)
+    ? this.payments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+    : 0;
+  return Math.round(((this.advancePaid || 0) + laterPayments) * 100) / 100;
+});
+
+// Remaining balance = grand total − total paid.
+invoiceSchema.virtual('balanceDue').get(function () {
+  return Math.round(((this.grandTotal || 0) - this.totalPaid) * 100) / 100;
 });
 
 // Pre-save hook to generate invoice number

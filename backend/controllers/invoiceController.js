@@ -226,6 +226,102 @@ export const updateInvoiceStatus = async (req, res) => {
   }
 };
 
+// Add a later payment to an invoice
+export const addInvoicePayment = async (req, res) => {
+  try {
+    const { amount, date, note } = req.body;
+    const numericAmount = Number(amount);
+
+    if (!numericAmount || numericAmount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'A valid payment amount is required'
+      });
+    }
+
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice) {
+      return res.status(404).json({
+        success: false,
+        message: 'Invoice not found'
+      });
+    }
+
+    invoice.payments.push({
+      amount: numericAmount,
+      date: date ? new Date(date) : new Date(),
+      note: note || ''
+    });
+
+    // Auto-update status based on how much has now been paid.
+    if (invoice.totalPaid >= invoice.grandTotal && invoice.grandTotal > 0) {
+      invoice.status = 'paid';
+    } else if (invoice.totalPaid > 0) {
+      invoice.status = 'partial';
+    }
+
+    await invoice.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment added successfully',
+      data: invoice
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to add payment',
+      error: error.message
+    });
+  }
+};
+
+// Remove a later payment from an invoice
+export const deleteInvoicePayment = async (req, res) => {
+  try {
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice) {
+      return res.status(404).json({
+        success: false,
+        message: 'Invoice not found'
+      });
+    }
+
+    const payment = invoice.payments.id(req.params.paymentId);
+    if (!payment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Payment not found'
+      });
+    }
+
+    invoice.payments.pull(req.params.paymentId);
+
+    // Re-evaluate status after removing a payment.
+    if (invoice.totalPaid >= invoice.grandTotal && invoice.grandTotal > 0) {
+      invoice.status = 'paid';
+    } else if (invoice.totalPaid > 0) {
+      invoice.status = 'partial';
+    } else {
+      invoice.status = 'pending';
+    }
+
+    await invoice.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment removed successfully',
+      data: invoice
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to remove payment',
+      error: error.message
+    });
+  }
+};
+
 // Get invoice statistics
 export const getInvoiceStats = async (req, res) => {
   try {
