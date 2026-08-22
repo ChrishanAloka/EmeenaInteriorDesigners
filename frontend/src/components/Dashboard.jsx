@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { quotationAPI, invoiceAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -8,13 +8,25 @@ import './Dashboard.css';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [stats, setStats] = useState(null);
   const [invoiceStats, setInvoiceStats] = useState(null);
   const [quotations, setQuotations] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('quotations'); // 'quotations' or 'invoices'
+  // Read the active tab from the URL (?tab=invoices) so navigating back from
+  // an invoice/quotation returns to the correct section. Defaults to quotations.
+  const [activeTab, setActiveTab] = useState(
+    searchParams.get('tab') === 'invoices' ? 'invoices' : 'quotations'
+  );
+
+  // Keep the URL query in sync when the user switches tabs.
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setSearchParams(tab === 'invoices' ? { tab: 'invoices' } : {});
+  };
 
   const [filters, setFilters] = useState({
     status: '',
@@ -183,13 +195,13 @@ const Dashboard = () => {
       <div className="tab-navigation">
         <button
           className={`tab-button ${activeTab === 'quotations' ? 'active' : ''}`}
-          onClick={() => setActiveTab('quotations')}
+          onClick={() => handleTabChange('quotations')}
         >
           📊 Quotations
         </button>
         <button
           className={`tab-button ${activeTab === 'invoices' ? 'active' : ''}`}
-          onClick={() => setActiveTab('invoices')}
+          onClick={() => handleTabChange('invoices')}
         >
           🧾 Invoices
         </button>
@@ -375,6 +387,17 @@ const Dashboard = () => {
                           >
                             View
                           </Link>
+                          <button
+                            onClick={() =>
+                              navigate('/invoices/create', {
+                                state: { duplicateFrom: invoice }
+                              })
+                            }
+                            className="btn btn-sm btn-primary"
+                            title="Create a new invoice with the same items and client"
+                          >
+                            Duplicate
+                          </button>
                           {user?.role === 'admin' && (
                             <button
                               onClick={() => {

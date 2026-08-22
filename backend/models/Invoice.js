@@ -139,6 +139,14 @@ const invoiceSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
+  isDuplicate: {
+    type: Boolean,
+    default: false
+  },
+  duplicatedFromInvoiceNo: {
+    type: String,
+    default: ''
+  },
   status: {
     type: String,
     enum: ['draft', 'pending', 'paid', 'partial'],
