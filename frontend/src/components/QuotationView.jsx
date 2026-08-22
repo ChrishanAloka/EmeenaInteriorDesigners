@@ -423,6 +423,7 @@ const QuotationView = () => {
           <div className="agreement-section">
             <h4>Payments</h4>
             <p>60% of the Grand total must be paid as the advanced payment. Balance payment should be done on the installation day at the project site on the agreed date.</p>
+            <p>If the balance payment is not made within 3 days after installation, the item will have to be uninstalled and taken back.</p>
           </div>
 
           <div className="agreement-section">

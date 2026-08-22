@@ -330,6 +330,165 @@
   font-weight: 600;
 }
 
+.total-row.advance-paid-row {
+  align-items: center;
+}
+
+.advance-paid-input {
+  width: 140px;
+  max-width: 50%;
+  padding: 6px 10px;
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d4ed8;
+  text-align: right;
+  background: #eff6ff;
+}
+
+.advance-paid-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.advance-hint {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.advance-reset-btn {
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: #3b82f6;
+  background: transparent;
+  border: 1px solid #93c5fd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.advance-reset-btn:hover {
+  background: #eff6ff;
+}
+
+/* Payments panel on the invoice form */
+.payments-manager-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.payments-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.payments-summary strong {
+  color: #1f2937;
+}
+
+.payments-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.payments-table th,
+.payments-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 13px;
+}
+
+.payments-table th {
+  background: #f1f5f9;
+  font-weight: 700;
+  color: #374151;
+}
+
+.add-payment-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.add-payment-row input {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.add-payment-row input[type="number"] {
+  width: 140px;
+}
+
+.add-payment-row input[type="text"] {
+  flex: 1;
+  min-width: 160px;
+}
+
+.total-row.total-paid-row {
+  border-top: 1px dashed #94a3b8;
+  margin-top: 4px;
+  padding-top: 6px;
+  font-weight: 700;
+}
+
+.advance-paid-input.advance-locked {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.carried-payment-row td {
+  background: #f8fafc;
+  color: #475569;
+}
+
+.carried-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+
+.btn-green {
+  background: #10b981;
+  color: white;
+  border: none;
+}
+
+.btn-green:hover {
+  background: #059669;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  border: none;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
 .form-actions {
   display: flex;
   justify-content: flex-end;

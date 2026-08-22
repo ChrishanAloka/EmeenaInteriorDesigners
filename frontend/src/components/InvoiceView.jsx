@@ -49,146 +49,154 @@ const InvoiceView = () => {
   };
 
   const handleDownloadPDF = async () => {
-    const element = document.querySelector('.invoice-view.printable');
-    if (!element) {
+    const source = document.querySelector('.invoice-view.printable');
+    if (!source) {
       toast.error('Invoice content not found');
       return;
     }
 
+    let stagingArea = null;
     try {
       toast.loading('Generating PDF...');
 
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        logging: false,
-        onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.querySelector('.invoice-view.printable');
-          if (clonedElement) {
-            // Force Print-like dimensions and styles
-            clonedElement.style.width = '210mm';
-            clonedElement.style.minHeight = '297mm';
-            clonedElement.style.padding = '10mm';
-            clonedElement.style.margin = '0';
-            clonedElement.style.boxShadow = 'none';
-            clonedElement.style.borderRadius = '0';
-            clonedElement.style.fontSize = '10pt';
-            clonedElement.style.lineHeight = '1.2';
+      // Applies the same print-like normalisation used previously so the PDF
+      // matches the print preview.
+      const normalize = (root) => {
+        root.style.width = '210mm';
+        root.style.margin = '0';
+        root.style.boxShadow = 'none';
+        root.style.borderRadius = '0';
+        root.style.fontSize = '10pt';
+        root.style.lineHeight = '1.2';
+        root.style.background = '#ffffff';
 
-            const smallTexts = clonedElement.querySelectorAll('p, li');
-            smallTexts.forEach(txt => {
-              txt.style.fontSize = '8.5pt';
-              txt.style.lineHeight = '1.2';
-              txt.style.margin = '2px 0';
-            });
-
-            const smallTexts2 = clonedElement.querySelectorAll('span, strong');
-            smallTexts2.forEach(txt => {
-              txt.style.fontSize = '8.5pt';
-              txt.style.lineHeight = '1.2';
-              txt.style.margin = '0';
-            });
-
-            const totalsSection = clonedElement.querySelector('.totals-section');
-            totalsSection.style.maxWidth = '100%';
-            totalsSection.style.width = '100%';
-
-            const signatureBox = clonedElement.querySelectorAll('.signature-box p');
-            signatureBox.forEach(txt => {
-              txt.style.paddingLeft = '80px';
-              txt.style.paddingTop = '10px';
-              txt.style.margin = '0px 0px';
-            });
-
-            // Sync internal elements to match the print CSS precisely
-            const tableCells = clonedElement.querySelectorAll('.items-table th, .items-table td');
-            tableCells.forEach(cell => {
-              cell.style.padding = '3px 4px';
-              cell.style.fontSize = '9pt';
-              cell.style.border = '1px solid #000';
-            });
-
-            const infoPs = clonedElement.querySelectorAll('.info-section p');
-            infoPs.forEach(p => {
-              p.style.margin = '2px 0';
-              p.style.fontSize = '8.5pt';
-            });
-
-            const totals = clonedElement.querySelectorAll('.total-row');
-            totals.forEach(row => {
-              row.style.fontSize = '9pt';
-              row.style.padding = '2px 0';
-            });
-
-            const headings = clonedElement.querySelectorAll('h2, h3, h4');
-            headings.forEach(h => {
-              if (h.classList.contains('invoice-title')) {
-                h.style.fontSize = '14pt';
-                h.style.margin = '0 0 10px';
-              } else {
-                h.style.fontSize = '10pt';
-                h.style.margin = '0 0 5px';
-              }
-            });
-
-            // Make brand logos small in PDF
-            const brandLogos = clonedElement.querySelectorAll('.brand-logo');
-            brandLogos.forEach(logo => {
-              logo.style.height = '24px';
-              logo.style.width = 'auto';
-            });
-
-            // Make business logo (company logo) height match company details height
-            const businessLogo = clonedElement.querySelector('.company-logo img');
-            const companyDetails = clonedElement.querySelector('.company-details');
-            if (businessLogo && companyDetails) {
-              businessLogo.style.height = `${companyDetails.offsetHeight}px`;
-              businessLogo.style.width = 'auto';
-            }
-
-            const serviceAgreement = clonedElement.querySelector('.service-agreement');
-            if (serviceAgreement) {
-              const beforeElements = [];
-              let curr = serviceAgreement.previousElementSibling;
-              while (curr) {
-                beforeElements.unshift(curr);
-                curr = curr.previousElementSibling;
-              }
-
-              const page1Wrapper = clonedDoc.createElement('div');
-              // A4 height (297mm) - top/bottom padding (10mm total) = 287mm
-              page1Wrapper.style.minHeight = '287mm';
-              page1Wrapper.style.display = 'flex';
-              page1Wrapper.style.flexDirection = 'column';
-
-              beforeElements.forEach(el => page1Wrapper.appendChild(el));
-              clonedElement.insertBefore(page1Wrapper, serviceAgreement);
-            }
-
+        root.querySelectorAll('p, li').forEach(txt => {
+          txt.style.fontSize = '8.5pt';
+          txt.style.lineHeight = '1.2';
+          txt.style.margin = '2px 0';
+        });
+        root.querySelectorAll('span, strong').forEach(txt => {
+          txt.style.fontSize = '8.5pt';
+          txt.style.lineHeight = '1.2';
+          txt.style.margin = '0';
+        });
+        root.querySelectorAll('.items-table th, .items-table td').forEach(cell => {
+          cell.style.padding = '3px 4px';
+          cell.style.fontSize = '9pt';
+          cell.style.border = '1px solid #000';
+        });
+        root.querySelectorAll('.table-subtotal-row td').forEach(cell => {
+          cell.style.background = '#f0f4f0';
+          cell.style.fontSize = '10pt';
+          cell.style.fontWeight = '700';
+        });
+        root.querySelectorAll('.info-section p').forEach(p => {
+          p.style.margin = '2px 0';
+          p.style.fontSize = '8.5pt';
+        });
+        root.querySelectorAll('.total-row').forEach(row => {
+          row.style.fontSize = '9pt';
+          row.style.padding = '2px 0';
+        });
+        root.querySelectorAll('h2, h3, h4').forEach(h => {
+          if (h.classList.contains('invoice-title')) {
+            h.style.fontSize = '14pt';
+            h.style.margin = '0 0 10px';
+          } else {
+            h.style.fontSize = '10pt';
+            h.style.margin = '0 0 5px';
           }
+        });
+        root.querySelectorAll('.brand-logo').forEach(logoEl => {
+          logoEl.style.height = '40px';
+          logoEl.style.width = 'auto';
+        });
+        const totalsSection = root.querySelector('.totals-section');
+        if (totalsSection) {
+          totalsSection.style.maxWidth = '100%';
+          totalsSection.style.width = '100%';
+        }
+        root.querySelectorAll('.no-print').forEach(el => el.remove());
+      };
+
+      // Build an off-screen staging area holding two A4 "page" containers.
+      stagingArea = document.createElement('div');
+      stagingArea.style.position = 'fixed';
+      stagingArea.style.left = '-10000px';
+      stagingArea.style.top = '0';
+      stagingArea.style.background = '#ffffff';
+      document.body.appendChild(stagingArea);
+
+      const makePage = () => {
+        const page = document.createElement('div');
+        page.style.width = '210mm';
+        page.style.minHeight = '297mm';
+        page.style.padding = '10mm';
+        page.style.boxSizing = 'border-box';
+        page.style.background = '#ffffff';
+        stagingArea.appendChild(page);
+        return page;
+      };
+
+      const clone = source.cloneNode(true);
+      normalize(clone);
+
+      // Split the cloned content: everything before .totals-section goes to
+      // page 1 (header, invoice info, item table incl. Sub Total row);
+      // .totals-section and everything after go to page 2.
+      const children = Array.from(clone.children);
+      const totalsIndex = children.findIndex(c => c.classList.contains('totals-section'));
+
+      const page1 = makePage();
+      const page2 = makePage();
+
+      children.forEach((child, i) => {
+        if (totalsIndex === -1 || i < totalsIndex) {
+          page1.appendChild(child);
+        } else {
+          page2.appendChild(child);
         }
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 210;
-      const pageHeight = 297;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const renderPage = async (pageEl) => {
+        const canvas = await html2canvas(pageEl, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+        return canvas;
+      };
 
-      const totalPages = Math.ceil(imgHeight / pageHeight);
       const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidthMm = 210;
+      const pageHeightMm = 297;
 
-      for (let i = 0; i < totalPages; i++) {
+      const pages = [page1, page2];
+      for (let i = 0; i < pages.length; i++) {
+        // Skip an empty page 2 (e.g. if structure ever changes)
+        if (!pages[i].hasChildNodes()) continue;
+        const canvas = await renderPage(pages[i]);
+        const imgData = canvas.toDataURL('image/png');
+        let imgHeightMm = (canvas.height * pageWidthMm) / canvas.width;
+        // Clamp so a single logical page never spills into an extra sheet.
+        if (imgHeightMm > pageHeightMm) imgHeightMm = pageHeightMm;
         if (i > 0) pdf.addPage();
-        const yPos = -i * pageHeight;
-        pdf.addImage(imgData, 'PNG', 0, yPos, imgWidth, imgHeight, undefined, 'FAST');
+        pdf.addImage(imgData, 'PNG', 0, 0, pageWidthMm, imgHeightMm, undefined, 'FAST');
       }
 
       pdf.save(`${invoice.invoiceNo}.pdf`);
+      toast.dismiss();
       toast.success('PDF downloaded successfully!');
     } catch (error) {
       console.error('PDF generation failed:', error);
+      toast.dismiss();
       toast.error('Failed to generate PDF. Please try again.');
+    } finally {
+      if (stagingArea && stagingArea.parentNode) {
+        stagingArea.parentNode.removeChild(stagingArea);
+      }
     }
   };
 
@@ -200,6 +208,17 @@ const InvoiceView = () => {
     } catch (error) {
       toast.error('Failed to update status');
     }
+  };
+
+  // Total paid = original advance + all later payments (mirrors the model virtual).
+  const computeTotalPaid = (inv) => {
+    if (!inv) return 0;
+    if (typeof inv.totalPaid === 'number') return inv.totalPaid;
+    const later = Array.isArray(inv.payments)
+      ? inv.payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
+      : 0;
+    const advance = inv.advancePaid != null ? inv.advancePaid : inv.grandTotal * 0.6;
+    return Math.round((advance + later) * 100) / 100;
   };
 
   if (loading) {
@@ -230,10 +249,21 @@ const InvoiceView = () => {
   return (
     <div className="invoice-view-container">
       <div className="view-header no-print">
-        <button onClick={() => navigate('/dashboard')} className="btn btn-secondary">
+        <button onClick={() => navigate('/dashboard?tab=invoices')} className="btn btn-secondary">
           ← Back
         </button>
         <div className="header-actions">
+          <button
+            onClick={() =>
+              navigate('/invoices/create', {
+                state: { duplicateFrom: invoice }
+              })
+            }
+            className="btn btn-secondary"
+            title="Create a new invoice with the same items and client"
+          >
+            📄 Create Same Invoice
+          </button>
           <button onClick={handlePrint} className="btn btn-secondary">
             🖨️ Print
           </button>
@@ -242,6 +272,22 @@ const InvoiceView = () => {
           </button>
         </div>
       </div>
+
+      {invoice.status === 'paid' && (
+        <div className="paid-notice no-print">
+          <span>✅ This invoice is fully paid.</span>
+          <button
+            onClick={() =>
+              navigate('/invoices/create', {
+                state: { duplicateFrom: invoice }
+              })
+            }
+            className="btn btn-sm btn-green"
+          >
+            Create Same Invoice for New Order
+          </button>
+        </div>
+      )}
 
       {canUpdateStatus && (
         <div className="status-actions no-print">
@@ -331,6 +377,12 @@ const InvoiceView = () => {
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr className="table-subtotal-row">
+              <td colSpan="5" className="text-right"><strong>Sub Total</strong></td>
+              <td className="text-right"><strong>{formatCurrency(invoice.subTotal)}</strong></td>
+            </tr>
+          </tfoot>
         </table>
 
         <div className="totals-section">
@@ -351,24 +403,47 @@ const InvoiceView = () => {
             <strong>{formatCurrency(invoice.grandTotal)}</strong>
           </div>
           <div className="total-row advance-payment">
-            <span>Advance Payment (60%):</span>
-            <strong>{formatCurrency(invoice.grandTotal * 0.6)}</strong>
+            <span>Advance Paid:</span>
+            <strong>- {formatCurrency(invoice.advancePaid ?? invoice.grandTotal * 0.6)}</strong>
           </div>
-          <div className="total-row">
-            <span>Balance Payment (40%):</span>
-            <strong>{formatCurrency(invoice.grandTotal * 0.4)}</strong>
-          </div>
+          {Array.isArray(invoice.payments) && invoice.payments.map((p, i) => (
+            <div className="total-row" key={p._id || i}>
+              <span>
+                Payment {i + 1}
+                {p.date ? ` (${format(new Date(p.date), 'dd/MM/yyyy')})` : ''}:
+              </span>
+              <strong>- {formatCurrency(p.amount)}</strong>
+            </div>
+          ))}
+          {(() => {
+            const totalPaid = computeTotalPaid(invoice);
+            const balance = invoice.grandTotal - totalPaid;
+            return (
+              <>
+                <div className="total-row total-paid-row">
+                  <span>Total Paid:</span>
+                  <strong>{formatCurrency(totalPaid)}</strong>
+                </div>
+                <div className="total-row">
+                  <span>
+                    {balance >= 0 ? 'Balance Payment:' : 'Overpaid (refund/credit):'}
+                  </span>
+                  <strong>{formatCurrency(Math.abs(balance))}</strong>
+                </div>
+              </>
+            );
+          })()}
         </div>
 
         <div className="service-agreement">
           <div className="agreement-section">
             <h4>Regulations</h4>
-            <p>60% of the Grand total must be paid as the advanced payment. Balance payment should be done on the installation day at the project site. Customer must keep all the warranty documents for relevant items and products safe.</p>
+            <p>60% of the Grand total must be paid as the advanced payment. Balance payment should be done on the installation day at the project site. If the balance payment is not made within 3 days after installation, the item will have to be uninstalled and taken back. Customer must keep all the warranty documents for relevant items and products safe.</p>
           </div>
 
           <div className="agreement-section">
             <h4>Our Services</h4>
-            <p><strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs | Office Table | Other</strong></p>
+            <p><strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs | Office Table | Wardrobe | Iron board | Dressing tables | Extra light | Railing | Transport | Other charges | Vanity cupboard | Island table | Other</strong></p>
             <p><strong>Sink | Tap | Burner | Cooker hood | Plate rack | Cup and saucer rack | Cutlery tray | Bottle pullout | Spice pullout cabinet | Larder unit | Magic cover pullout | Dustbin rack | Glass frame bar</strong></p>
           </div>
 

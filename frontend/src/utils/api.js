@@ -65,6 +65,8 @@ export const invoiceAPI = {
   update: (id, data) => api.put(`/invoices/${id}`, data),
   delete: (id) => api.delete(`/invoices/${id}`),
   updateStatus: (id, status) => api.patch(`/invoices/${id}/status`, { status }),
+  addPayment: (id, payment) => api.post(`/invoices/${id}/payments`, payment),
+  deletePayment: (id, paymentId) => api.delete(`/invoices/${id}/payments/${paymentId}`),
   getStats: () => api.get('/invoices/stats')
 };
 export default api;

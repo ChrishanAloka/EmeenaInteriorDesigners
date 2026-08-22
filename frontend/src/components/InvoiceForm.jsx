@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { quotationAPI, invoiceAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -8,6 +8,7 @@ import './InvoiceForm.css';
 
 const InvoiceForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -45,14 +46,48 @@ const InvoiceForm = () => {
       { itemName: 'Dustbin rack', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Glass frame bar', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Office Table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Wardrobe', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Iron board', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Dressing tables', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Extra light', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Railing', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Transport', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Other charges', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Vanity cupboard', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
+      { itemName: 'Island table', quantity: 0, lineFit: '', unitPrice: 0, total: 0 },
       { itemName: 'Other', quantity: 0, lineFit: '', unitPrice: 0, total: 0 }
     ],
     taxVAT: 0,
     discount: 0,
+    advancePaid: 0,
+    payments: [],
     status: 'draft',
     notes: '',
-    quotationId: null // Changed to null instead of empty string
+    quotationId: null, // Changed to null instead of empty string
+    isDuplicate: false,
+    duplicatedFromInvoiceNo: ''
   });
+
+  // Draft entry for the "add payment" row on the form.
+  const [newPayment, setNewPayment] = useState({
+    amount: '',
+    date: format(new Date(), 'yyyy-MM-dd'),
+    note: ''
+  });
+
+  // Whether this form was opened as a duplicate of an existing invoice.
+  // Computed synchronously so it's already true on the very first render,
+  // before calculateTotals can auto-fill the advance to 60%.
+  const isDuplicateSource = !!location.state?.duplicateFrom;
+
+  // Tracks whether the user has manually typed an advance amount.
+  // While false, the advance auto-fills to 60% of the grand total.
+  // For duplicates the advance is a fixed carried value, so start "edited".
+  const [advanceEdited, setAdvanceEdited] = useState(isDuplicateSource);
+
+  // True when this form is a duplicate of a previous invoice. In that case the
+  // advance is carried exactly from the parent (no 60% suggestion) and locked.
+  const [duplicateMode, setDuplicateMode] = useState(isDuplicateSource);
 
   const [quotations, setQuotations] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -66,9 +101,69 @@ const InvoiceForm = () => {
     fetchQuotations();
   }, []);
 
+  // Pre-fill the form when creating a copy of an existing invoice.
+  // The source invoice is passed via router state (see Dashboard / InvoiceView).
+  useEffect(() => {
+    const source = location.state?.duplicateFrom;
+    if (!source) return;
+
+    // Parent's advance, exactly as recorded (no 60% suggestion).
+    const parentAdvance =
+      source.advancePaid != null
+        ? source.advancePaid
+        : Math.round((source.grandTotal || 0) * 0.6 * 100) / 100;
+
+    // Parent's individual payments, carried over and locked.
+    const carriedPayments = Array.isArray(source.payments)
+      ? source.payments.map(p => ({
+          amount: Number(p.amount) || 0,
+          date: p.date ? format(new Date(p.date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+          note: p.note || '',
+          carried: true
+        }))
+      : [];
+
+    setFormData(prev => ({
+      ...prev,
+      // Fresh date for the new invoice, keep everything else from the source.
+      date: format(new Date(), 'yyyy-MM-dd'),
+      clientTitle: source.clientTitle || 'Mr.',
+      clientName: source.clientName || '',
+      clientCompany: source.clientCompany || '',
+      clientAddress: source.clientAddress || '',
+      clientPhone: source.clientPhone || '',
+      items: (source.items && source.items.length > 0)
+        ? source.items.map(it => ({
+            itemName: it.itemName || '',
+            quantity: it.quantity || 0,
+            lineFit: it.lineFit || '',
+            unitPrice: it.unitPrice || 0,
+            total: it.total || 0
+          }))
+        : prev.items,
+      taxVAT: source.taxVAT || 0,
+      discount: source.discount || 0,
+      // Carry the parent's advance exactly, plus its individual payments.
+      advancePaid: parentAdvance,
+      payments: carriedPayments,
+      status: 'draft',
+      notes: source.notes || '',
+      quotationId: null,
+      isDuplicate: true,
+      duplicatedFromInvoiceNo: source.invoiceNo || ''
+    }));
+    setDuplicateMode(true);
+    // Advance is a fixed carried value (no 60% auto-fill).
+    setAdvanceEdited(true);
+    toast.success('Invoice copied. Advance and previous payments carried over.');
+    // Clear the router state so a refresh doesn't re-trigger the copy.
+    window.history.replaceState({}, document.title);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
+
   useEffect(() => {
     calculateTotals();
-  }, [formData.items, formData.taxVAT, formData.discount]);
+  }, [formData.items, formData.taxVAT, formData.discount, advanceEdited, duplicateMode]);
 
   const fetchQuotations = async () => {
     try {
@@ -88,6 +183,15 @@ const InvoiceForm = () => {
     const grandTotal = subTotal + taxAmount - formData.discount;
 
     setTotals({ subTotal, grandTotal });
+
+    // Until the user manually types an advance amount, keep it suggested at 60%.
+    // In duplicate mode the field is a fixed "Paid" amount, so never auto-fill.
+    if (!advanceEdited && !duplicateMode) {
+      setFormData(prev => ({
+        ...prev,
+        advancePaid: Math.round(grandTotal * 0.6 * 100) / 100
+      }));
+    }
   };
 
   const handleInputChange = (e) => {
@@ -96,6 +200,58 @@ const InvoiceForm = () => {
       ...formData,
       [name]: value
     });
+  };
+
+  const handleAdvanceChange = (e) => {
+    setAdvanceEdited(true);
+    setFormData(prev => ({
+      ...prev,
+      advancePaid: parseFloat(e.target.value) || 0
+    }));
+  };
+
+  const resetAdvanceToDefault = () => {
+    setAdvanceEdited(false);
+  };
+
+  // Sum of extra payments added on the form (not counting the advance).
+  const paymentsTotal = formData.payments.reduce(
+    (sum, p) => sum + (Number(p.amount) || 0),
+    0
+  );
+  // Everything paid so far = advance + extra payments.
+  const totalPaid = Math.round(((Number(formData.advancePaid) || 0) + paymentsTotal) * 100) / 100;
+
+  const handleAddPayment = () => {
+    const amount = parseFloat(newPayment.amount);
+    if (!amount || amount <= 0) {
+      toast.error('Enter a valid payment amount');
+      return;
+    }
+    setFormData(prev => ({
+      ...prev,
+      payments: [
+        ...prev.payments,
+        {
+          amount,
+          date: newPayment.date || format(new Date(), 'yyyy-MM-dd'),
+          note: newPayment.note || ''
+        }
+      ]
+    }));
+    setNewPayment({
+      amount: '',
+      date: format(new Date(), 'yyyy-MM-dd'),
+      note: ''
+    });
+  };
+
+  const handleRemovePayment = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      // Carried-over payments from the parent invoice cannot be removed.
+      payments: prev.payments.filter((p, i) => i !== index || p.carried)
+    }));
   };
 
   const handleItemChange = (index, field, value) => {
@@ -113,7 +269,8 @@ const InvoiceForm = () => {
   };
 
   const handleQuotationSelect = (quotation) => {
-    // Auto-fill client details from selected quotation
+    // Auto-fill client details and items from the selected quotation.
+    // Items are copied into the editable table so they can be adjusted.
     setFormData(prev => ({
       ...prev,
       clientTitle: quotation.clientTitle || 'Mr.',
@@ -121,10 +278,21 @@ const InvoiceForm = () => {
       clientCompany: quotation.clientCompany || '',
       clientAddress: quotation.clientAddress || '',
       clientPhone: quotation.clientPhone || '',
+      items: (quotation.items && quotation.items.length > 0)
+        ? quotation.items.map(it => ({
+            itemName: it.itemName || '',
+            quantity: it.quantity || 0,
+            lineFit: it.lineFit || '',
+            unitPrice: it.unitPrice || 0,
+            total: it.total || 0
+          }))
+        : prev.items,
+      taxVAT: quotation.taxVAT || 0,
+      discount: quotation.discount || 0,
       quotationId: quotation._id // This will be a valid ObjectId or null
     }));
 
-    toast.success('Client details filled from quotation');
+    toast.success('Client details and items filled from quotation');
   };
 
   const handleSubmit = async (e) => {
@@ -146,10 +314,23 @@ const InvoiceForm = () => {
       const submitData = {
         ...formData,
         items: filteredItems,
+        // Persist only the payment fields the model expects (drop UI-only flags).
+        payments: (formData.payments || []).map(p => ({
+          amount: Number(p.amount) || 0,
+          date: p.date,
+          note: p.note || ''
+        })),
         subTotal: totals.subTotal,
         grandTotal: totals.grandTotal,
         preparedBy: user?._id,
         preparedByName: user?.fullName,
+        // Reflect how much has been paid so far in the status.
+        status:
+          totalPaid >= totals.grandTotal && totals.grandTotal > 0
+            ? 'paid'
+            : totalPaid > 0
+              ? 'partial'
+              : formData.status,
         // Only include quotationId if it's not null
         ...(formData.quotationId && { quotationId: formData.quotationId })
       };
@@ -159,10 +340,16 @@ const InvoiceForm = () => {
         delete submitData.quotationId;
       }
 
-      await invoiceAPI.create(submitData);
+      const response = await invoiceAPI.create(submitData);
       toast.success('Invoice created successfully!');
 
-      navigate('/dashboard');
+      // Go straight to the newly created invoice's view page.
+      const newId = response?.data?.data?._id;
+      if (newId) {
+        navigate(`/invoices/view/${newId}`);
+      } else {
+        navigate('/dashboard?tab=invoices');
+      }
     } catch (error) {
       console.error('Create invoice error:', error);
       toast.error(error.response?.data?.message || 'Failed to save invoice');
@@ -416,6 +603,9 @@ const InvoiceForm = () => {
               <strong>Balance payment should be done on the installation day at the project site.</strong>
             </p>
             <p>
+              <strong>If the balance payment is not made within 3 days after installation, the item will have to be uninstalled and taken back.</strong>
+            </p>
+            <p>
               <strong>Customer must keep all the warranty documents for relevant items and products safe.</strong>
             </p>
           </div>
@@ -425,7 +615,7 @@ const InvoiceForm = () => {
           <h2>Our Services</h2>
           <div className="services-section">
             <p>
-              <strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs | Office Table | Other</strong>
+              <strong>Pantry up | Pantry bottom | Granite | Quartz | TV Wall | Design Wall | Dressing Room | Wardrobe Dressing Table | Bar area | Salon, shop and all interior designs | Office Table | Wardrobe | Iron board | Dressing tables | Extra light | Railing | Transport | Other charges | Vanity cupboard | Island table | Other</strong>
             </p>
             <p>
               <strong>Sink | Tap | Burner | Cooker hood | Plate rack | Cup and saucer rack | Cutlery tray | Bottle pullout | Spice pullout cabinet | Larder unit | Magic cover pullout | Dustbin rack | Glass frame bar</strong>
@@ -490,14 +680,151 @@ const InvoiceForm = () => {
                 <span>Grand Total:</span>
                 <strong>{formatCurrency(totals.grandTotal)}</strong>
               </div>
-              <div className="total-row advance-payment">
-                <span>Advance Payment (60%):</span>
-                <strong>{formatCurrency(totals.grandTotal * 0.6)}</strong>
+
+              {duplicateMode ? (
+                <div className="total-row advance-payment advance-paid-row">
+                  <span>
+                    Advance Paid:
+                    <em className="advance-hint"> (carried from previous invoice)</em>
+                  </span>
+                  <input
+                    type="number"
+                    className="advance-paid-input advance-locked"
+                    value={formData.advancePaid}
+                    readOnly
+                    tabIndex={-1}
+                  />
+                </div>
+              ) : (
+                <div className="total-row advance-payment advance-paid-row">
+                  <span>
+                    Advance Paid:
+                    {!advanceEdited && (
+                      <em className="advance-hint"> (60% suggested)</em>
+                    )}
+                    {advanceEdited && (
+                      <button
+                        type="button"
+                        className="advance-reset-btn"
+                        onClick={resetAdvanceToDefault}
+                        title="Reset to 60% of grand total"
+                      >
+                        reset to 60%
+                      </button>
+                    )}
+                  </span>
+                  <input
+                    type="number"
+                    className="advance-paid-input"
+                    value={formData.advancePaid}
+                    onChange={handleAdvanceChange}
+                    min="0"
+                    step="0.01"
+                    onWheel={(e) => e.currentTarget.blur()}
+                  />
+                </div>
+              )}
+              {formData.payments.map((p, i) => (
+                <div className="total-row" key={i}>
+                  <span>
+                    Payment {i + 1}
+                    {p.date ? ` (${format(new Date(p.date), 'dd/MM/yyyy')})` : ''}:
+                  </span>
+                  <strong>- {formatCurrency(p.amount)}</strong>
+                </div>
+              ))}
+              <div className="total-row total-paid-row">
+                <span>Total Paid:</span>
+                <strong>{formatCurrency(totalPaid)}</strong>
               </div>
               <div className="total-row">
-                <span>Balance Payment (40%):</span>
-                <strong>{formatCurrency(totals.grandTotal * 0.4)}</strong>
+                <span>
+                  {totals.grandTotal - totalPaid >= 0
+                    ? 'Balance Payment:'
+                    : 'Overpaid (refund/credit):'}
+                </span>
+                <strong>
+                  {formatCurrency(Math.abs(totals.grandTotal - totalPaid))}
+                </strong>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <h2>Payments</h2>
+          <div className="payments-manager-form">
+            <div className="payments-summary">
+              <span>Advance Paid: <strong>{formatCurrency(formData.advancePaid)}</strong></span>
+              <span>Total Paid: <strong>{formatCurrency(totalPaid)}</strong></span>
+              <span>Balance: <strong>{formatCurrency(Math.abs(totals.grandTotal - totalPaid))}</strong></span>
+            </div>
+
+            {formData.payments.length > 0 && (
+              <table className="payments-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Note</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formData.payments.map((p, i) => (
+                    <tr key={i} className={p.carried ? 'carried-payment-row' : ''}>
+                      <td>{i + 1}</td>
+                      <td>{p.date ? format(new Date(p.date), 'dd/MM/yyyy') : '-'}</td>
+                      <td>{formatCurrency(p.amount)}</td>
+                      <td>{p.note || '-'}</td>
+                      <td>
+                        {p.carried ? (
+                          <span className="carried-tag">Carried</span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleRemovePayment(i)}
+                            className="btn btn-sm btn-danger"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            <div className="add-payment-row">
+              <input
+                type="number"
+                placeholder="Amount"
+                value={newPayment.amount}
+                min="0"
+                step="0.01"
+                onChange={(e) => setNewPayment({ ...newPayment, amount: e.target.value })}
+                onWheel={(e) => e.currentTarget.blur()}
+              />
+              <input
+                type="date"
+                value={newPayment.date}
+                onChange={(e) => setNewPayment({ ...newPayment, date: e.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Note (optional)"
+                value={newPayment.note}
+                onChange={(e) => setNewPayment({ ...newPayment, note: e.target.value })}
+              />
+              <button
+                type="button"
+                onClick={handleAddPayment}
+                className="btn btn-sm btn-green"
+              >
+                + Add Payment
+              </button>
             </div>
           </div>
         </div>
