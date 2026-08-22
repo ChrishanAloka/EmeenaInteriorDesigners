@@ -139,6 +139,17 @@ const Dashboard = () => {
     }).format(amount);
   };
 
+  // Total paid on an invoice = original advance + all later payments.
+  const getTotalPaid = (invoice) => {
+    if (!invoice) return 0;
+    if (typeof invoice.totalPaid === 'number') return invoice.totalPaid;
+    const later = Array.isArray(invoice.payments)
+      ? invoice.payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
+      : 0;
+    const advance = invoice.advancePaid != null ? invoice.advancePaid : 0;
+    return Math.round((advance + later) * 100) / 100;
+  };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -350,6 +361,8 @@ const Dashboard = () => {
                   <th>Client</th>
                   <th>Date</th>
                   <th>Grand Total</th>
+                  {/* <th>Paid</th>
+                  <th>Balance</th> */}
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -360,6 +373,9 @@ const Dashboard = () => {
                     <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
                       No invoices found. Create your first invoice!
                     </td>
+                    {/* <td colSpan="8" style={{ textAlign: 'center', padding: '40px' }}>
+                      No invoices found. Create your first invoice!
+                    </td> */}
                   </tr>
                 ) : (
                   invoices.map((invoice) => (
@@ -374,6 +390,17 @@ const Dashboard = () => {
                       <td>
                         <strong>{formatCurrency(invoice.grandTotal)}</strong>
                       </td>
+                      {/* <td>{formatCurrency(getTotalPaid(invoice))}</td> */}
+                      {/* <td>
+                        {(() => {
+                          const balance = (invoice.grandTotal || 0) - getTotalPaid(invoice);
+                          return (
+                            <strong className={balance <= 0 ? 'balance-cleared' : 'balance-due'}>
+                              {formatCurrency(Math.abs(balance))}
+                            </strong>
+                          );
+                        })()}
+                      </td> */}
                       <td>
                         <span className={`badge ${getStatusBadge(invoice.status)}`}>
                           {getStatusLabel(invoice.status)}
