@@ -50,3 +50,4 @@ ios/Pods/
 android/.gradle/
 android/app/build/
 
+*.zip
